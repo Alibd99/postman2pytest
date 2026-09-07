@@ -156,3 +156,181 @@ when multiple authentication schemes are used in the same collection.
 
 Completed.
 
+
+
+
+
+\--------------------------------------------------------------------------------
+
+\## Maintenance Task 2 - Additive Maintenance
+
+
+
+\### Feature
+
+Added limited support for Postman pre-request scripts.
+
+
+
+The supported pattern is:
+
+
+
+pm.environment.set("key", "value");
+
+
+
+This allows simple literal environment-variable assignments in a Postman
+
+pre-request script to be carried over into the generated pytest code.
+
+
+
+\### Previous Behavior
+
+Before this change, pre-request events were not used as request setup
+
+functionality.
+
+
+
+The parser handled Postman `test` events for expected status codes and
+
+assertions, but did not expose pre-request environment assignments.
+
+
+
+\### Reproduction / Feature Test
+
+A new parser test was added:
+
+
+
+test\_parse\_prerequest\_environment\_set
+
+
+
+Before implementation, the test failed because ParsedRequest had no
+
+`prerequest\_variables` field.
+
+
+
+\### Implementation
+
+The parser was extended to detect literal pre-request assignments such as:
+
+
+
+pm.environment.set("token", "abc123");
+
+
+
+These assignments are stored in:
+
+
+
+prerequest\_variables
+
+
+
+The pytest template was then extended to generate equivalent Python code
+
+before the HTTP request, for example:
+
+
+
+os.environ\["token"] = "abc123"
+
+
+
+\### Files Changed
+
+\- core/parser.py
+
+\- templates/test\_collection.jinja2
+
+\- tests/test\_parser.py
+
+\- tests/test\_generator.py
+
+\- project\_docs/maintenance-log.md
+
+
+
+\### Testing
+
+Added:
+
+\- parser test for extracting pre-request variables
+
+\- generator test for emitting the environment assignment
+
+
+
+Previous full suite:
+
+210 tests passed.
+
+
+
+Expected new full suite:
+
+212 tests.
+
+
+
+\### Maintenance Type
+
+Additive maintenance.
+
+
+
+This change adds a new supported Postman feature that was not previously
+
+available in the generated pytest output.
+
+
+
+\### Scope
+
+The implementation currently supports only simple literal string assignments
+
+using:
+
+
+
+pm.environment.set("key", "value");
+
+
+
+More complex JavaScript expressions are not supported.
+
+
+
+\### Status
+
+Implementation completed.
+
+Final full regression test pending.
+
+
+
+\### Status
+
+Completed.
+
+
+
+Final regression result:
+
+212 tests passed.
+
+
+
+\--------------------------------------------------------------------------------------
+
+
+
+
+
