@@ -430,12 +430,16 @@ def generate(
     # shared auth_headers fixture written to conftest.py.
     non_auth_per_request: list[dict[str, str]] = []
     has_auth_per_request: list[bool] = []
+    auth_names_per_request: list[list[str]] = []
     auth_headers_map: dict[str, str] = {}
     seen_auth_lower: set[str] = set()  # HTTP header names are case-insensitive
+
     for req in requests:
         non_auth, auth_items = _split_auth_headers(req, postman_env)
         non_auth_per_request.append(non_auth)
         has_auth_per_request.append(bool(auth_items))
+        auth_names_per_request.append([name for name, _ in auth_items])
+
         for name, expr in auth_items:
             if name.lower() in seen_auth_lower:
                 continue  # same header in another casing: keep the first entry
@@ -448,6 +452,7 @@ def generate(
     ]
 
     generated_at = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+
     rendered = template.render(
         requests=requests,
         base_url_default=base_url_default,
@@ -455,6 +460,7 @@ def generate(
         all_fixtures=all_fixtures,
         non_auth_per_request=non_auth_per_request,
         has_auth_per_request=has_auth_per_request,
+        auth_names_per_request=auth_names_per_request,
         params_per_request=params_per_request,
         collection_name=collection_name,
         generated_at=generated_at,

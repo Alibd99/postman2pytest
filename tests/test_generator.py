@@ -132,7 +132,7 @@ def test_generate_headers_present(tmp_path):
     conftest = (out.parent / "conftest.py").read_text(encoding="utf-8")
     # non-auth header stays inline; the auth header moves to the shared fixture.
     assert "Accept" in content
-    assert "**auth_headers" in content
+    assert '"Authorization": auth_headers["Authorization"]' in content
     assert "Bearer token" not in content
     assert "Authorization" in conftest
     assert "AUTH_TOKEN" in conftest
