@@ -256,6 +256,49 @@ def _render_files(file_fields: list[tuple[str, str]]) -> str:
     body = ", ".join(entries)
     return "{" + body + "}" if unique else "[" + body + "]"
 
+def _render_file_contexts(file_fields: list[tuple[str, str]]) -> str:
+    """Render context managers for multipart upload file handles."""
+    import json
+
+    contexts: list[str] = []
+
+    for index, (key, filename) in enumerate(file_fields):
+        path = (
+            f"os.environ.get("
+            f"{json.dumps(_file_env_name(key))}, "
+            f"{json.dumps(filename)})"
+        )
+
+        contexts.append(
+            f'open({path}, "rb") as _file_{index}'
+        )
+
+    return ", ".join(contexts)
+
+
+def _render_files_from_handles(file_fields: list[tuple[str, str]]) -> str:
+    """Render the requests files= structure using already-open file handles."""
+    import json
+
+    keys = [key for key, _ in file_fields]
+    unique = len(set(keys)) == len(keys)
+
+    entries: list[str] = []
+
+    for index, (key, _) in enumerate(file_fields):
+        if unique:
+            entries.append(
+                f"{json.dumps(key)}: _file_{index}"
+            )
+        else:
+            entries.append(
+                f"({json.dumps(key)}, _file_{index})"
+            )
+
+    body = ", ".join(entries)
+
+    return "{" + body + "}" if unique else "[" + body + "]"
+
 
 def _render_auth_value(name: str, value: str, env: PostmanEnvironment | None) -> str:
     """Python expression for one auth header value in the auth_headers fixture.
@@ -412,6 +455,8 @@ def generate(
     )
     env.filters["tojson"] = _to_python_repr
     env.filters["render_files"] = _render_files
+    env.filters["render_file_contexts"] = _render_file_contexts
+    env.filters["render_files_from_handles"] = _render_files_from_handles
     env.filters["docstring"] = _docstring_safe
     env.filters["strip_base_url"] = _strip_base_url
     base_var, base_url_default = _base_url_choice(requests, postman_env, _BASE_URL_FALLBACK)

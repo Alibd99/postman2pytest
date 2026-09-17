@@ -212,7 +212,7 @@ test\_parse\_prerequest\_environment\_set
 
 Before implementation, the test failed because ParsedRequest had no
 
-`prerequest\_variables` field.
+`prerequest\\\_variables` field.
 
 
 
@@ -310,14 +310,6 @@ More complex JavaScript expressions are not supported.
 
 \### Status
 
-Implementation completed.
-
-Final full regression test pending.
-
-
-
-\### Status
-
 Completed.
 
 
@@ -329,8 +321,4 @@ Final regression result:
 
 
 \--------------------------------------------------------------------------------------
-
-
-
-
 
