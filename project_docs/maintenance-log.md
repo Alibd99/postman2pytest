@@ -322,3 +322,71 @@ Final regression result:
 
 \--------------------------------------------------------------------------------------
 
+
+
+\## Maintenance Task 3 - Preventive Maintenance
+
+
+
+\### Problem
+
+Generated multipart upload tests opened files with `open(..., "rb")`
+
+without explicit context management.
+
+
+
+\### Risk
+
+File handles could remain open longer than necessary and potentially
+
+cause resource-management problems.
+
+
+
+\### Verification
+
+A new test was added:
+
+
+
+test\_generated\_file\_upload\_uses\_context\_manager
+
+
+
+The test initially failed because the generated code did not use a
+
+`with open(...)` context manager.
+
+
+
+\### Solution
+
+The generator and Jinja template were changed so multipart upload files
+
+are opened inside a context manager and are automatically closed after
+
+the request completes.
+
+
+
+\### Testing
+
+The focused preventive test passed.
+
+All body-mode tests passed.
+
+Final full regression result: 213 tests passed.
+
+
+
+\### Maintenance Type
+
+Preventive maintenance.
+
+
+
+\### Status
+
+Completed.
+
