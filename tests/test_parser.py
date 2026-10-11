@@ -1,4 +1,7 @@
 """Tests for core/parser.py"""
+from types import SimpleNamespace
+
+from core.parser import filter_requests_by_method
 
 import json
 import re
@@ -488,3 +491,37 @@ def test_parse_prerequest_environment_set(tmp_path):
     )
 
     assert requests[0].prerequest_variables == {"token": "abc123"}
+def test_filter_requests_by_method_keeps_only_matching_method():
+    requests = [
+        SimpleNamespace(method="GET"),
+        SimpleNamespace(method="POST"),
+        SimpleNamespace(method="GET"),
+    ]
+
+    result = filter_requests_by_method(requests, "GET")
+
+    assert len(result) == 2
+    assert all(req.method == "GET" for req in result)
+
+
+def test_filter_requests_by_method_is_case_insensitive():
+    requests = [
+        SimpleNamespace(method="GET"),
+        SimpleNamespace(method="POST"),
+    ]
+
+    result = filter_requests_by_method(requests, "get")
+
+    assert len(result) == 1
+    assert result[0].method == "GET"
+
+
+def test_filter_requests_by_method_returns_empty_when_no_match():
+    requests = [
+        SimpleNamespace(method="GET"),
+        SimpleNamespace(method="POST"),
+    ]
+
+    result = filter_requests_by_method(requests, "DELETE")
+
+    assert result == []
