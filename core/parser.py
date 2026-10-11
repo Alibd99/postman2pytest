@@ -438,3 +438,17 @@ def parse_collection(path: Path) -> list[ParsedRequest]:
     _disambiguate(results)
     logger.info("Parsed %d requests from collection", len(results))
     return results
+
+def filter_requests_by_method(requests: list[ParsedRequest], method: str) -> list[ParsedRequest]:
+    """
+    Filter a list of ParsedRequest objects by HTTP method.
+
+    Returns a new list containing only requests whose method matches the
+    specified method (case-insensitive). If no requests match, returns an
+    empty list.
+    """
+    method_upper = method.upper()
+    filtered_requests = [req for req in requests if req.method.upper() == method_upper]
+    if not filtered_requests:
+        logger.warning("No requests found with HTTP method: %s", method)
+    return filtered_requests

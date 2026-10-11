@@ -15,7 +15,7 @@ from pathlib import Path
 from core.environment import Environment, load_environment
 from core.generator import generate
 from core.openapi_parser import parse_openapi, spec_title
-from core.parser import ParsedRequest, parse_collection
+from core.parser import ParsedRequest, parse_collection , filter_requests_by_method
 
 try:
     __version__ = version("postman2pytest")
@@ -68,6 +68,10 @@ def main() -> int:
     parser.add_argument(
         "--filter-folder",
         help="Only generate tests for requests in the named Postman folder (case-insensitive)",
+    )
+    parser.add_argument(
+        "--method",
+        help="Only generate tests for requests with the specified HTTP method (case-insensitive)",
     )
     parser.add_argument(
         "--env",
@@ -123,7 +127,12 @@ def main() -> int:
         if not requests:
             logger.error("Folder not found or contains no valid requests: %s", args.filter_folder)
             return 1
-
+      # New additive feature
+    if args.method:
+        requests = filter_requests_by_method(
+            requests,
+            args.method
+        )
     if not requests:
         logger.error("No valid requests found in collection. Nothing to generate.")
         return 1
