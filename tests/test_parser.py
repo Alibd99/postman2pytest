@@ -96,6 +96,15 @@ def test_extract_status_ignores_negated_response_code():
     assert _extract_status(events) is None
 
 
+def test_extract_status_ignores_negated_have_status():
+    events = [
+        {
+            "listen": "test",
+            "script": {"exec": ["pm.response.to.not.have.status(500);"]},
+        }
+    ]
+    assert _extract_status(events) is None
+
 # Parse_collection
 
 
