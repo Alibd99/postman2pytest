@@ -58,7 +58,7 @@ def _slugify(text: str) -> str:
     return slug or "unnamed"
 
 
-_STATUS_HAVE_RE = re.compile(r"\.have\.status\((\d+)\)")
+_STATUS_HAVE_RE = re.compile(r"(?<!\.not)\.have\.status\((\d+)\)")
 _STATUS_CODE_RE = re.compile(r"pm\.response\.code\s*===?\s*(\d+)")
 
 _PREREQUEST_ENV_SET_RE = re.compile(
